@@ -1,0 +1,649 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#00d9ff">
+  <meta name="color-scheme" content="dark">
+  <link rel="manifest" href="manifest.json">
+  <title>OpenAI Model Options and Intelligence Levels</title>
+  <style>
+    :root {
+      --vf-void: #05080f;
+      --vf-forge: #0a0e1a;
+      --vf-anvil: #121824;
+      --vf-iron: #1a2332;
+      --vf-steel: #2d3748;
+      --aegis-cyan: #00d9ff;
+      --aegis-cyan-soft: #7ecfdf;
+      --aegis-purple: #a78bfa;
+      --aegis-pink: #ff00aa;
+      --text-forge: #e8edf4;
+      --text-iron: #9ca3af;
+      --text-steel: #8b95a3;
+      --rune-success: #10b981;
+      --rune-warning: #f59e0b;
+      --rune-danger: #ef4444;
+      --rune-code: #161d2d;
+      --spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+      --ease-forge: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      --dur-fast: 180ms;
+      --dur-mid: 300ms;
+      --dur-slow: 500ms;
+      --nav-height: 62px;
+      --max-content: 1200px;
+      --max-prose: 68ch;
+      --radius-sm: 6px;
+      --radius-md: 10px;
+      --radius-lg: 14px;
+      --radius-pill: 30px;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: linear-gradient(180deg, var(--vf-void), var(--vf-forge) 28%, var(--vf-void));
+      color: var(--text-iron);
+      line-height: 1.8;
+      overflow-x: hidden;
+    }
+    a { color: var(--aegis-cyan-soft); }
+    a:hover { color: var(--aegis-cyan); }
+    button, select, input { font: inherit; }
+    p, li, td, summary, label { max-width: var(--max-prose); }
+    h1, h2, h3 { max-width: var(--max-prose); color: var(--text-forge); margin-top: 0; }
+    .skip-link {
+      position: absolute; left: 12px; top: -48px; z-index: 1000;
+      background: var(--aegis-cyan); color: #031018; padding: 12px 16px; border-radius: 999px; text-decoration: none;
+    }
+    .skip-link:focus { top: 12px; }
+    .shell { max-width: var(--max-content); margin: 0 auto; padding: 0 16px 96px; }
+    .vf-hero {
+      position: relative; overflow: hidden;
+      padding: clamp(80px, 12vw, 130px) 20px clamp(60px, 8vw, 90px);
+      background: linear-gradient(160deg, var(--vf-void), var(--vf-forge), var(--vf-iron));
+      border-bottom: 2px solid var(--aegis-cyan);
+    }
+    .vf-hero::before {
+      content: ""; position: absolute; inset: -20% 20% auto; height: 360px;
+      background: radial-gradient(circle, rgba(0,217,255,.16), transparent 65%);
+      filter: blur(20px); pointer-events: none;
+    }
+    .hero-content, .section, .site-nav, .site-footer { max-width: var(--max-content); margin: 0 auto; }
+    .hero-content { position: relative; z-index: 1; padding: 0 16px; }
+    .hero-eyebrow, .section-eyebrow, .chip {
+      color: var(--aegis-cyan); text-transform: uppercase; letter-spacing: .18em;
+      font-size: clamp(.68rem, .8vw, .72rem); font-weight: 700;
+    }
+    h1 { margin: .35rem 0 1rem; font-size: clamp(1.9rem, 5vw + 1rem, 3.5rem); line-height: 1.05; }
+    h2 { font-size: clamp(1.6rem, 3.5vw + .5rem, 2.6rem); line-height: 1.1; margin-bottom: .5rem; }
+    h3 { font-size: clamp(1.05rem, 2vw, 1.35rem); line-height: 1.2; margin-bottom: .5rem; }
+    .hero-subtitle, .section-desc, .card-copy, .wizard-note, .truth-copy, .source-copy, .table-note, .print-note {
+      font-size: clamp(.95rem, 1.5vw, 1.05rem); color: var(--text-iron);
+    }
+    .hero-actions, .copy-row, .wizard-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 28px; }
+    .vf-btn {
+      min-height: 44px; display: inline-flex; align-items: center; justify-content: center;
+      padding: 0 18px; border-radius: var(--radius-pill); font-weight: 700; text-decoration: none;
+      border: 1px solid transparent; transition: transform var(--dur-fast) var(--spring), filter var(--dur-fast), box-shadow var(--dur-mid);
+      will-change: transform; touch-action: manipulation; cursor: pointer;
+    }
+    .vf-btn:hover { transform: scale(1.04); filter: brightness(1.08); }
+    .vf-btn.primary { background: linear-gradient(135deg, var(--aegis-cyan), var(--aegis-purple)); color: #fff; }
+    .vf-btn.secondary { background: transparent; border-color: var(--aegis-cyan); color: var(--aegis-cyan); }
+    .vf-btn.ghost { background: rgba(167,139,250,.1); border-color: rgba(167,139,250,.28); color: var(--aegis-purple); }
+    .vf-btn.small { min-height: 44px; padding-inline: 14px; font-size: .92rem; }
+    .site-nav {
+      position: sticky; top: 0; z-index: 50; backdrop-filter: blur(16px);
+      background: rgba(10,14,26,.92); border-bottom: 1px solid rgba(0,217,255,.15);
+    }
+    .site-nav ul {
+      display: flex; gap: 10px; list-style: none; margin: 0; padding: 10px 16px; overflow: auto;
+    }
+    .site-nav a {
+      display: inline-flex; align-items: center; min-height: 44px; padding: 10px 14px; border-radius: 999px;
+      text-decoration: none; color: var(--text-iron); white-space: nowrap;
+    }
+    .site-nav a[aria-current="true"] { background: rgba(0,217,255,.12); color: var(--aegis-cyan); box-shadow: inset 0 0 0 1px rgba(0,217,255,.25); }
+    .section { padding: 48px 16px; }
+    .section-header { margin-bottom: 18px; }
+    .section-grid { display: grid; gap: 16px; grid-template-columns: 1fr; }
+    .aegis-card, .wizard-panel, .source-panel {
+      background: var(--vf-anvil); border: 1px solid var(--vf-steel); border-radius: var(--radius-lg);
+      padding: clamp(20px, 3.5vw, 28px);
+      transition: transform var(--dur-mid) var(--spring), border-color var(--dur-mid), box-shadow var(--dur-mid) var(--ease-forge);
+    }
+    .aegis-card:hover, .wizard-panel:hover, .source-panel:hover { transform: translateY(-4px); border-color: var(--aegis-cyan); box-shadow: 0 10px 30px rgba(0,217,255,.12); }
+    .rune-box { border-left: 4px solid; padding: 16px 20px; border-radius: var(--radius-sm); }
+    .rune-info { background: rgba(0,217,255,.05); border-color: var(--aegis-cyan); }
+    .rune-warning { background: rgba(245,158,11,.05); border-color: var(--rune-warning); }
+    .rune-success { background: rgba(16,185,129,.05); border-color: var(--rune-success); }
+    .badge { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 8px 12px; border-radius: 999px; font-size: .82rem; font-weight: 700; letter-spacing: .04em; }
+    .badge.known { background: rgba(16,185,129,.12); color: var(--rune-success); border: 1px solid rgba(16,185,129,.25); }
+    .badge.inferred { background: rgba(0,217,255,.12); color: var(--aegis-cyan); border: 1px solid rgba(0,217,255,.22); }
+    .badge.unclear { background: rgba(245,158,11,.12); color: var(--rune-warning); border: 1px solid rgba(245,158,11,.24); }
+    .badge-row { display: flex; flex-wrap: wrap; gap: 10px; margin: 16px 0 0; }
+    .vf-table { width: 100%; border-collapse: collapse; overflow: hidden; border: 1px solid var(--vf-steel); border-radius: var(--radius-lg); }
+    .vf-table th, .vf-table td { padding: 14px 12px; text-align: left; vertical-align: top; border-bottom: 1px solid rgba(45,55,72,.65); }
+    .vf-table th { background: var(--vf-iron); color: var(--text-forge); }
+    .vf-table td { color: var(--text-iron); }
+    .vf-table .mini { display: block; margin-top: 6px; font-size: .82rem; color: var(--text-steel); }
+    .vf-table .label-chip { display: inline-flex; margin-top: 8px; padding: 4px 10px; border-radius: 999px; font-size: .72rem; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; }
+    .label-known { background: rgba(16,185,129,.12); color: var(--rune-success); }
+    .label-inferred { background: rgba(0,217,255,.12); color: var(--aegis-cyan); }
+    .label-unclear { background: rgba(245,158,11,.12); color: var(--rune-warning); }
+    details {
+      background: var(--vf-anvil); border: 1px solid var(--vf-steel); border-left: 4px solid var(--aegis-cyan);
+      border-radius: var(--radius-md); overflow: hidden;
+    }
+    details:nth-of-type(2n) { border-left-color: var(--aegis-purple); }
+    details:nth-of-type(3n) { border-left-color: var(--aegis-pink); }
+    summary { cursor: pointer; list-style: none; padding: 16px 18px; color: var(--text-forge); font-weight: 700; min-height: 44px; }
+    summary::-webkit-details-marker { display: none; }
+    details .detail-body { padding: 0 18px 18px; }
+    .code-wrap { position: relative; background: var(--rune-code); border: 1px solid var(--vf-steel); border-radius: var(--radius-md); overflow: hidden; }
+    .code-wrap pre { margin: 0; padding: 16px; overflow: auto; font-size: clamp(.75rem, 1.5vw, .88rem); color: var(--text-forge); }
+    .code-tools { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 14px; }
+    .wizard-form { display: grid; gap: 14px; }
+    .wizard-grid { display: grid; gap: 14px; grid-template-columns: 1fr; }
+    .field { display: grid; gap: 8px; }
+    .field label { color: var(--text-forge); font-weight: 700; }
+    .field select, .field input[type="range"] {
+      width: 100%; min-height: 44px; background: var(--vf-iron); color: var(--text-forge); border: 1px solid var(--vf-steel); border-radius: var(--radius-md); padding: 10px 12px;
+    }
+    .range-row { display: flex; align-items: center; gap: 12px; }
+    .range-value { min-width: 88px; color: var(--aegis-cyan); font-weight: 700; }
+    .result-box { background: rgba(0,217,255,.06); border: 1px solid rgba(0,217,255,.18); border-radius: var(--radius-md); padding: 18px; }
+    .result-title { color: var(--text-forge); font-size: clamp(1.05rem, 2vw, 1.35rem); font-weight: 800; margin-bottom: 8px; }
+    .source-list { display: grid; gap: 12px; margin: 0; padding-left: 18px; }
+    .source-list li { max-width: var(--max-prose); }
+    .source-copy { margin-top: 10px; }
+    footer { padding: 36px 16px 100px; color: var(--text-steel); }
+    .status-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+    .status-chip { padding: 8px 12px; border-radius: 999px; background: rgba(167,139,250,.12); color: var(--aegis-purple); border: 1px solid rgba(167,139,250,.28); }
+    .table-note { margin-top: 12px; }
+    .comparison-stack { display: grid; gap: 16px; }
+    .prompt-grid { display: grid; gap: 16px; grid-template-columns: 1fr; }
+    @media (min-width: 640px) {
+      .section-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .wizard-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .prompt-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+    @media (min-width: 1024px) {
+      .section-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+      .prompt-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+      .shell { padding-bottom: 32px; }
+    }
+    @media (max-width: 680px) {
+      .vf-table thead { display: none; }
+      .vf-table, .vf-table tbody, .vf-table tr, .vf-table td { display: block; width: 100%; }
+      .vf-table tr { margin-bottom: 16px; border: 1px solid var(--vf-steel); border-radius: 10px; overflow: hidden; background: var(--vf-anvil); }
+      .vf-table td { display: flex; flex-direction: column; gap: 4px; border-bottom: 1px solid rgba(45,55,72,.45); }
+      .vf-table td::before { content: attr(data-label); color: var(--aegis-cyan); font-size: .72rem; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }
+    }
+    @media print {
+      body { background: #fff; color: #111; }
+      .site-nav, .hero-actions, .skip-link, .copy-row, .code-tools, .status-row { display: none !important; }
+      .vf-hero { background: #fff; border-bottom: 1px solid #999; }
+      .aegis-card, .rune-box, details, .source-panel, .wizard-panel, .code-wrap { break-inside: avoid; border-color: #999; background: #fff; color: #111; box-shadow: none; }
+      a { color: #000; text-decoration: underline; }
+      .vf-table th { background: #eee; color: #111; }
+      .vf-table td { color: #111; }
+    }
+  </style>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to main content</a>
+<nav class="site-nav" id="site-nav" aria-label="Primary" data-visible="true">
+  <ul>
+    <li><a href="#mission">Mission</a></li>
+    <li><a href="#wizard">Wizard</a></li>
+    <li><a href="#levels">Levels</a></li>
+    <li><a href="#models">Models</a></li>
+    <li><a href="#truth">Truth</a></li>
+    <li><a href="#sources">Sources</a></li>
+    <li><a href="#prompts">Prompts</a></li>
+    <li><a href="#code">Math</a></li>
+  </ul>
+</nav>
+<header class="vf-hero" id="hero" role="banner">
+  <div class="hero-content">
+    <span class="hero-eyebrow">Forge artifact · model guidance</span>
+    <h1>OpenAI model options and intelligence levels</h1>
+    <p class="hero-subtitle">A truth-first reference page with a decision wizard, verification-aware comparison table, copyable prompts, and a clean mobile-safe layout.</p>
+    <div class="hero-actions">
+      <a class="vf-btn primary" href="#wizard">Use the wizard</a>
+      <a class="vf-btn secondary" href="#models">Compare models</a>
+      <a class="vf-btn ghost" href="#sources">See verification</a>
+    </div>
+    <div class="status-row">
+      <span class="status-chip">Truth-first</span>
+      <span class="status-chip">Clarify when unsure</span>
+      <span class="status-chip">No unsupported claims</span>
+    </div>
+  </div>
+</header>
+<main id="main" class="shell">
+  <section class="section" id="mission" aria-labelledby="mission-title">
+    <div class="section-header">
+      <span class="section-eyebrow">01 — Mission</span>
+      <h2 id="mission-title">What this artifact does</h2>
+      <p class="section-desc">It turns the conversation into a practical reference page while keeping the tone aligned with the mission: be clear, separate verified facts from interpretation, and avoid pretending to know what is not supported.</p>
+    </div>
+    <div class="section-grid">
+      <article class="aegis-card">
+        <h3>Aligned behavior</h3>
+        <p class="card-copy">The page explains how to choose between speed and depth, and it labels claims so readers can see what is known, inferred, or still unclear.</p>
+      </article>
+      <article class="aegis-card">
+        <h3>Math check</h3>
+        <p class="card-copy">For the equation 9 ÷ 3 = x, the value of x is 3.</p>
+      </article>
+      <article class="aegis-card">
+        <h3>Practical output</h3>
+        <p class="card-copy">The strongest result is a page that helps someone pick a model setting quickly, then explains why that choice makes sense.</p>
+      </article>
+    </div>
+  </section>
+
+  <section class="section" id="wizard" aria-labelledby="wizard-title">
+    <div class="section-header">
+      <span class="section-eyebrow">02 — Decision wizard</span>
+      <h2 id="wizard-title">Model Picker Decision Wizard</h2>
+      <p class="section-desc">Answer the questions below and the page will recommend a model/setting with a plain-English reason. The logic favors accuracy when risk or complexity rises.</p>
+    </div>
+    <div class="wizard-panel">
+      <form class="wizard-form" id="decision-wizard">
+        <div class="wizard-grid">
+          <div class="field">
+            <label for="task-type">Task type</label>
+            <select id="task-type" name="task-type">
+              <option value="writing">Writing</option>
+              <option value="coding">Coding</option>
+              <option value="research">Research</option>
+              <option value="visual">Visual analysis</option>
+              <option value="planning">Planning</option>
+              <option value="audit">Audit work</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="complexity">Complexity</label>
+            <select id="complexity" name="complexity">
+              <option value="quick">Quick and simple</option>
+              <option value="mixed">Mixed complexity</option>
+              <option value="complex">Complex / multi-step</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="speed-depth">Speed vs depth</label>
+            <select id="speed-depth" name="speed-depth">
+              <option value="speed">Speed matters most</option>
+              <option value="balanced">Balanced</option>
+              <option value="depth">Depth matters most</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="risk">Risk level</label>
+            <select id="risk" name="risk">
+              <option value="low">Low risk</option>
+              <option value="medium">Medium risk</option>
+              <option value="high">High risk</option>
+            </select>
+          </div>
+        </div>
+        <div class="field">
+          <label for="accuracy">Accuracy criticality</label>
+          <div class="range-row">
+            <input id="accuracy" name="accuracy" type="range" min="1" max="5" step="1" value="3" aria-describedby="accuracy-value">
+            <span id="accuracy-value" class="range-value">3 / 5</span>
+          </div>
+        </div>
+        <div class="result-box" id="wizard-result" aria-live="polite">
+          <div class="result-title">Recommended: GPT-5.5 Medium</div>
+          <p>Balanced tasks usually do best with a middle setting because it gives room for reasoning without unnecessary overhead.</p>
+        </div>
+        <div class="wizard-actions">
+          <button class="vf-btn primary" type="button" id="wizard-run">Update recommendation</button>
+          <button class="vf-btn secondary" type="button" id="wizard-reset">Reset defaults</button>
+        </div>
+      </form>
+    </div>
+  </section>
+
+  <section class="section" id="levels" aria-labelledby="levels-title">
+    <div class="section-header">
+      <span class="section-eyebrow">03 — Intelligence levels</span>
+      <h2 id="levels-title">Instant, Medium, and High</h2>
+      <p class="section-desc">Use the speed tier to match the risk and complexity of the job. Faster is not always better when reasoning depth matters.</p>
+    </div>
+    <table class="vf-table">
+      <thead>
+        <tr>
+          <th scope="col">Level</th>
+          <th scope="col">Best for</th>
+          <th scope="col">Why it fits</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td data-label="Level">Instant</td>
+          <td data-label="Best for">Quick drafting, summaries, simple rewrites, translation, and light brainstorming.</td>
+          <td data-label="Why it fits">You want a fast answer and the cost of a shallow pass is low.</td>
+        </tr>
+        <tr>
+          <td data-label="Level">Medium</td>
+          <td data-label="Best for">Planning, debugging, document review, comparisons, and complex explanations.</td>
+          <td data-label="Why it fits">It balances speed and deeper thinking for most serious everyday work.</td>
+        </tr>
+        <tr>
+          <td data-label="Level">High</td>
+          <td data-label="Best for">Architecture, multi-step analysis, security reviews, proofs, and high-stakes decisions.</td>
+          <td data-label="Why it fits">It gives the model more room to reason carefully before answering.</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section class="section" id="models" aria-labelledby="models-title">
+    <div class="section-header">
+      <span class="section-eyebrow">04 — Four-model comparison</span>
+      <h2 id="models-title">GPT-5.5, GPT-5.4, GPT-5.3, and o3</h2>
+      <p class="section-desc">This table keeps the wording disciplined. Each row carries a confidence label so readers can tell whether the statement is directly supported, reasonably inferred, or still unclear.</p>
+    </div>
+    <div class="comparison-stack">
+      <table class="vf-table">
+        <thead>
+          <tr>
+            <th scope="col">Option</th>
+            <th scope="col">Best use</th>
+            <th scope="col">Avoid when</th>
+            <th scope="col">Why</th>
+            <th scope="col">Confidence</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td data-label="Option">GPT-5.5 <span class="mini">General-purpose current choice</span></td>
+            <td data-label="Best use">Default serious work, writing, planning, mixed tasks.</td>
+            <td data-label="Avoid when">You need continuity with older output patterns.</td>
+            <td data-label="Why">A current general-purpose model is usually the safest starting point for broad work.</td>
+            <td data-label="Confidence"><span class="label-chip label-inferred">Inferred</span></td>
+          </tr>
+          <tr>
+            <td data-label="Option">GPT-5.4 <span class="mini">Older GPT-family option</span></td>
+            <td data-label="Best use">Legacy continuity, comparison testing, preserving an established style.</td>
+            <td data-label="Avoid when">You are starting fresh and want the simplest current default.</td>
+            <td data-label="Why">Older versions can be useful when consistency matters more than novelty.</td>
+            <td data-label="Confidence"><span class="label-chip label-unclear">Unclear</span></td>
+          </tr>
+          <tr>
+            <td data-label="Option">GPT-5.3 <span class="mini">Older GPT-family option</span></td>
+            <td data-label="Best use">Reproduction, comparison, and older behavior matching.</td>
+            <td data-label="Avoid when">You need the most current baseline for new work.</td>
+            <td data-label="Why">Legacy models are mainly useful when you are preserving or comparing past behavior.</td>
+            <td data-label="Confidence"><span class="label-chip label-unclear">Unclear</span></td>
+          </tr>
+          <tr>
+            <td data-label="Option">o3 <span class="mini">Reasoning-first model</span></td>
+            <td data-label="Best use">Deep reasoning, math, logic, contradiction hunting, and hard analysis.</td>
+            <td data-label="Avoid when">You need the fastest possible casual response.</td>
+            <td data-label="Why">Reasoning-focused models are best when the answer depends on careful multi-step thinking.</td>
+            <td data-label="Confidence"><span class="label-chip label-known">Known</span></td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="rune-box rune-warning table-note">
+        <strong>Table discipline:</strong> Some availability and naming details can vary by account, rollout, or product state. Where the page is not certain, it says so instead of guessing.
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="truth" aria-labelledby="truth-title">
+    <div class="section-header">
+      <span class="section-eyebrow">05 — Truth discipline</span>
+      <h2 id="truth-title">Verified facts, interpretation, and unknowns</h2>
+      <p class="section-desc">This section makes the epistemic boundaries visible. That helps the page stay useful without smuggling speculation into the final answer.</p>
+    </div>
+    <div class="section-grid">
+      <article class="aegis-card">
+        <h3>Verified facts</h3>
+        <p class="truth-copy">The page includes the user-provided equation 9 ÷ 3 = x and its result. The interface also uses a single-file HTML structure, dark theme tokens, skip link, and responsive sections.</p>
+        <div class="badge-row"><span class="badge known">Known</span></div>
+      </article>
+      <article class="aegis-card">
+        <h3>Interpretation</h3>
+        <p class="truth-copy">A middle reasoning setting is usually a strong default for mixed tasks because it balances speed and depth. That is a practical recommendation, not a universal law.</p>
+        <div class="badge-row"><span class="badge inferred">Inferred</span></div>
+      </article>
+      <article class="aegis-card">
+        <h3>Unknowns</h3>
+        <p class="truth-copy">Exact model availability, rollout timing, and account-specific picker behavior can change. The page does not pretend certainty where the source material does not support it.</p>
+        <div class="badge-row"><span class="badge unclear">Unclear</span></div>
+      </article>
+    </div>
+  </section>
+
+  <section class="section" id="sources" aria-labelledby="sources-title">
+    <div class="section-header">
+      <span class="section-eyebrow">06 — Sources / verification</span>
+      <h2 id="sources-title">Readable source names and placeholders</h2>
+      <p class="section-desc">Use this section as an audit trail. It intentionally avoids raw signed links and leaves clean placeholders for later live citations.</p>
+    </div>
+    <div class="source-panel">
+      <ul class="source-list">
+        <li><strong>User-provided screenshot / conversation text.</strong> Placeholder: attach the exact image or transcript reference here during final publishing.</li>
+        <li><strong>OpenAI product documentation.</strong> Placeholder: add the specific official page title and permalink once verified.</li>
+        <li><strong>OpenAI release notes or model picker notes.</strong> Placeholder: cite the exact release note title and version date here.</li>
+        <li><strong>Project verification log.</strong> Placeholder: insert internal notes showing which statements were confirmed, inferred, or left unclear.</li>
+      </ul>
+      <p class="source-copy">When later citations are added, keep them readable and short. The goal is to show provenance without cluttering the page with raw signed URLs or opaque links.</p>
+    </div>
+  </section>
+
+  <section class="section" id="prompts" aria-labelledby="prompts-title">
+    <div class="section-header">
+      <span class="section-eyebrow">07 — Copy prompts</span>
+      <h2 id="prompts-title">Ready-to-copy prompt starters</h2>
+      <p class="section-desc">These prompts turn the page into an operational tool. They are short, practical, and tuned for the task style most users actually need.</p>
+    </div>
+    <div class="prompt-grid">
+      <article class="aegis-card">
+        <h3>Quick answer</h3>
+        <p class="card-copy">Use this for short, direct questions when speed matters most.</p>
+        <div class="code-wrap"><pre id="prompt-quick">Give me a quick, clear answer with no extra fluff.</pre></div>
+        <div class="copy-row"><button class="vf-btn secondary small copy-btn" data-copy-target="prompt-quick" type="button">Copy prompt</button></div>
+      </article>
+      <article class="aegis-card">
+        <h3>Deep audit</h3>
+        <p class="card-copy">Use this when accuracy, completeness, and contradiction-hunting matter more than speed.</p>
+        <div class="code-wrap"><pre id="prompt-deep">Audit this carefully. Find contradictions, missing dependencies, weak assumptions, and edge cases. Explain your reasoning plainly.</pre></div>
+        <div class="copy-row"><button class="vf-btn secondary small copy-btn" data-copy-target="prompt-deep" type="button">Copy prompt</button></div>
+      </article>
+      <article class="aegis-card">
+        <h3>Clarification first</h3>
+        <p class="card-copy">Use this when the task is ambiguous or when you do not want the model to assume anything.</p>
+        <div class="code-wrap"><pre id="prompt-clarify">If anything is unclear, ask me clarifying questions before answering. Do not assume missing details.</pre></div>
+        <div class="copy-row"><button class="vf-btn secondary small copy-btn" data-copy-target="prompt-clarify" type="button">Copy prompt</button></div>
+      </article>
+      <article class="aegis-card">
+        <h3>Source verification</h3>
+        <p class="card-copy">Use this when the answer must be traceable to a source and uncertainty must be labeled.</p>
+        <div class="code-wrap"><pre id="prompt-source">Separate verified facts, reasonable inference, and unknowns. Cite the source for each factual claim and say when evidence is insufficient.</pre></div>
+        <div class="copy-row"><button class="vf-btn secondary small copy-btn" data-copy-target="prompt-source" type="button">Copy prompt</button></div>
+      </article>
+    </div>
+  </section>
+
+  <section class="section" id="recommended" aria-labelledby="recommended-title">
+    <div class="section-header">
+      <span class="section-eyebrow">08 — Recommended default stack</span>
+      <h2 id="recommended-title">Practical default usage</h2>
+      <p class="section-desc">This is the simple rule set that most users will remember. It gives a fast baseline, a careful baseline, and a deep-analysis fallback.</p>
+    </div>
+    <div class="section-grid">
+      <article class="aegis-card">
+        <h3>Everyday default</h3>
+        <p>Use a balanced reasoning setting for most serious work, especially writing, planning, and mixed tasks.</p>
+      </article>
+      <article class="aegis-card">
+        <h3>Fast mode</h3>
+        <p>Use the speed-oriented setting for simple summaries, rewrites, and quick questions where depth is not critical.</p>
+      </article>
+      <article class="aegis-card">
+        <h3>Deep audit mode</h3>
+        <p>Use the deeper reasoning setting for architecture, security, logic, math, and contradiction hunting.</p>
+      </article>
+    </div>
+  </section>
+
+  <section class="section" id="examples" aria-labelledby="examples-title">
+    <div class="section-header">
+      <span class="section-eyebrow">09 — Examples</span>
+      <h2 id="examples-title">When each choice makes sense</h2>
+      <p class="section-desc">Examples help the model picker feel concrete. They connect the setting to the kind of task a person is actually trying to complete.</p>
+    </div>
+    <details open>
+      <summary>Fast response example</summary>
+      <div class="detail-body"><p>Ask for a summary of a long article, a short rewrite, or a quick translation when speed matters more than deep analysis.</p></div>
+    </details>
+    <details>
+      <summary>Balanced reasoning example</summary>
+      <div class="detail-body"><p>Use a medium reasoning level for debugging, evaluating options, or explaining a complicated topic with clarity and structure.</p></div>
+    </details>
+    <details>
+      <summary>Deep reasoning example</summary>
+      <div class="detail-body"><p>Use a high reasoning level for architecture decisions, failure analysis, multi-step math, or any task where a wrong shortcut would be costly.</p></div>
+    </details>
+  </section>
+
+  <section class="section" id="clarity" aria-labelledby="clarity-title">
+    <div class="section-header">
+      <span class="section-eyebrow">10 — Communication rules</span>
+      <h2 id="clarity-title">How to answer safely</h2>
+      <p class="section-desc">The conversation asked for truthfulness, clarification, and no invented data. That means the answer should separate facts, interpretation, and uncertainty.</p>
+    </div>
+    <div class="rune-box rune-info">
+      <strong>Rule:</strong> If a detail cannot be verified from the available source, say that it is unclear instead of filling in the gap.
+    </div>
+  </section>
+
+  <section class="section" id="code" aria-labelledby="code-title">
+    <div class="section-header">
+      <span class="section-eyebrow">11 — Reference snippet</span>
+      <h2 id="code-title">Math result included in the source</h2>
+      <p class="section-desc">The source conversation explicitly includes the equation and the answer. This page preserves that result in a simple code-style block.</p>
+    </div>
+    <div class="code-wrap"><pre><code>9 ÷ 3 = x
+x = 3</code></pre></div>
+  </section>
+</main>
+<footer class="site-footer">
+  <p>Built for Jusstin DeRemus and the Fólkvangr Neural Core ecosystem.</p>
+</footer>
+<script>
+(function () {
+  'use strict';
+  var nav = document.getElementById('site-nav');
+  var sections = Array.prototype.slice.call(document.querySelectorAll('main section'));
+  nav.innerHTML = '<ul>' + sections.map(function (s) {
+    return '<li><a href="#' + s.id + '">' + s.querySelector('.section-eyebrow').textContent.replace(/\s+/g, ' ') + '</a></li>';
+  }).join('') + '</ul>';
+  var links = Array.prototype.slice.call(nav.querySelectorAll('a'));
+  var io = new IntersectionObserver(function (entries) {
+    entries.forEach(function (entry) {
+      if (entry.isIntersecting) {
+        links.forEach(function (a) { a.removeAttribute('aria-current'); });
+        var active = nav.querySelector('a[href="#' + entry.target.id + '"]');
+        if (active) active.setAttribute('aria-current', 'true');
+      }
+    });
+  }, { threshold: 0.45 });
+  sections.forEach(function (section) { io.observe(section); });
+
+  var accuracy = document.getElementById('accuracy');
+  var accuracyValue = document.getElementById('accuracy-value');
+  var taskType = document.getElementById('task-type');
+  var complexity = document.getElementById('complexity');
+  var speedDepth = document.getElementById('speed-depth');
+  var risk = document.getElementById('risk');
+  var wizardResult = document.getElementById('wizard-result');
+  var wizardRun = document.getElementById('wizard-run');
+  var wizardReset = document.getElementById('wizard-reset');
+
+  function scoreWizard() {
+    var score = 0;
+    var reasons = [];
+    var task = taskType.value;
+    var comp = complexity.value;
+    var speed = speedDepth.value;
+    var rk = risk.value;
+    var acc = parseInt(accuracy.value, 10);
+
+    if (comp === 'quick') score -= 2;
+    if (comp === 'mixed') score += 1;
+    if (comp === 'complex') score += 3;
+    if (speed === 'speed') score -= 2;
+    if (speed === 'balanced') score += 1;
+    if (speed === 'depth') score += 3;
+    if (rk === 'low') score -= 1;
+    if (rk === 'medium') score += 1;
+    if (rk === 'high') score += 3;
+    score += acc - 3;
+
+    if (task === 'coding' || task === 'audit' || task === 'research' || task === 'visual') score += 2;
+    if (task === 'writing' && speed === 'speed' && comp === 'quick') score -= 2;
+    if (task === 'planning' && speed !== 'speed') score += 1;
+
+    if (score <= -1) {
+      reasons.push('The task looks lightweight, so speed is the main priority.');
+      return { model: 'GPT-5.5 Instant', reason: reasons.join(' '), detail: 'Use the faster setting because the task is simple and the risk is low.' };
+    }
+    if (score <= 4) {
+      reasons.push('The task has enough moving parts to justify a balanced pass.');
+      return { model: 'GPT-5.5 Medium', reason: reasons.join(' '), detail: 'Use the middle setting because it balances speed, clarity, and careful reasoning.' };
+    }
+    reasons.push('The task is complex, risky, or accuracy-sensitive.');
+    if (task === 'coding' || task === 'audit' || task === 'research') {
+      return { model: 'GPT-5.5 High', reason: reasons.join(' '), detail: 'Use the deeper setting because the problem needs multi-step reasoning and a careful check for edge cases.' };
+    }
+    return { model: 'o3', reason: reasons.join(' '), detail: 'Use the reasoning-first model when you want the strongest contradiction hunting, logic checking, or deep analysis.' };
+  }
+
+  function renderWizard() {
+    accuracyValue.textContent = accuracy.value + ' / 5';
+    var out = scoreWizard();
+    wizardResult.innerHTML = '<div class="result-title">Recommended: ' + out.model + '</div><p>' + out.detail + '</p><p>' + out.reason + '</p>';
+  }
+  accuracy.addEventListener('input', renderWizard);
+  [taskType, complexity, speedDepth, risk].forEach(function (el) { el.addEventListener('change', renderWizard); });
+  wizardRun.addEventListener('click', renderWizard);
+  wizardReset.addEventListener('click', function () {
+    taskType.value = 'writing'; complexity.value = 'mixed'; speedDepth.value = 'balanced'; risk.value = 'low'; accuracy.value = '3'; renderWizard();
+  });
+  renderWizard();
+
+  function copyText(text) {
+    if (navigator.clipboard && navigator.clipboard.writeText) return navigator.clipboard.writeText(text);
+    var ta = document.createElement('textarea'); ta.value = text; ta.setAttribute('readonly', 'readonly'); ta.style.position = 'fixed'; ta.style.opacity = '0'; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta); return Promise.resolve();
+  }
+  Array.prototype.slice.call(document.querySelectorAll('.copy-btn')).forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var target = document.getElementById(btn.getAttribute('data-copy-target'));
+      if (!target) return;
+      var original = btn.textContent;
+      copyText(target.textContent).then(function () {
+        btn.textContent = '✓ Copied';
+        btn.style.borderColor = 'rgba(16,185,129,.45)';
+        btn.style.color = 'var(--rune-success)';
+        setTimeout(function () { btn.textContent = original; btn.style.borderColor = ''; btn.style.color = ''; }, 2000);
+      });
+    });
+  });
+}());
+</script>
+</body>
+</html>
