@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <meta name="theme-color" content="#00d9ff">
   <meta name="color-scheme" content="dark">
-  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%2305080f'/%3E%3Cpath d='M18 42V22h10c6 0 10 4 10 10s-4 10-10 10H18zm6-6h4c3 0 5-2 5-4s-2-4-5-4h-4v8zm21 6V22h6v20h-6z' fill='%2300d9ff'/%3E%3C/svg%3E">
   <title>OpenAI Model Options and Intelligence Levels</title>
   <style>
     :root {
@@ -51,6 +51,12 @@
     a { color: var(--aegis-cyan-soft); }
     a:hover { color: var(--aegis-cyan); }
     button, select, input { font: inherit; }
+    :focus { outline: none; }
+    :focus-visible {
+      outline: 3px solid var(--aegis-cyan);
+      outline-offset: 3px;
+      box-shadow: 0 0 0 4px rgba(0,217,255,.16);
+    }
     p, li, td, summary, label { max-width: var(--max-prose); }
     h1, h2, h3 { max-width: var(--max-prose); color: var(--text-forge); margin-top: 0; }
     .skip-link {
@@ -94,6 +100,7 @@
     .vf-btn.secondary { background: transparent; border-color: var(--aegis-cyan); color: var(--aegis-cyan); }
     .vf-btn.ghost { background: rgba(167,139,250,.1); border-color: rgba(167,139,250,.28); color: var(--aegis-purple); }
     .vf-btn.small { min-height: 44px; padding-inline: 14px; font-size: .92rem; }
+    .vf-btn[aria-pressed="true"] { box-shadow: inset 0 0 0 1px rgba(0,217,255,.25); }
     .site-nav {
       position: sticky; top: 0; z-index: 50; backdrop-filter: blur(16px);
       background: rgba(10,14,26,.92); border-bottom: 1px solid rgba(0,217,255,.15);
@@ -165,6 +172,10 @@
     .table-note { margin-top: 12px; }
     .comparison-stack { display: grid; gap: 16px; }
     .prompt-grid { display: grid; gap: 16px; grid-template-columns: 1fr; }
+    .status-legend { display: grid; gap: 12px; }
+    .status-legend-list { display: grid; gap: 10px; margin: 0; padding-left: 18px; }
+    body[data-mode="public"] [data-internal-branding] { display: none !important; }
+    body[data-mode="internal"] [data-public-branding] { display: none !important; }
     @media (min-width: 640px) {
       .section-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .wizard-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -207,6 +218,9 @@
     <li><a href="#truth">Truth</a></li>
     <li><a href="#sources">Sources</a></li>
     <li><a href="#prompts">Prompts</a></li>
+    <li><a href="#recommended">Recommended</a></li>
+    <li><a href="#examples">Examples</a></li>
+    <li><a href="#clarity">Clarity</a></li>
     <li><a href="#code">Math</a></li>
   </ul>
 </nav>
@@ -219,6 +233,7 @@
       <a class="vf-btn primary" href="#wizard">Use the wizard</a>
       <a class="vf-btn secondary" href="#models">Compare models</a>
       <a class="vf-btn ghost" href="#sources">See verification</a>
+      <button class="vf-btn ghost" type="button" id="mode-toggle" aria-pressed="false">Switch to public mode</button>
     </div>
     <div class="status-row">
       <span class="status-chip">Truth-first</span>
@@ -232,7 +247,7 @@
     <div class="section-header">
       <span class="section-eyebrow">01 — Mission</span>
       <h2 id="mission-title">What this artifact does</h2>
-      <p class="section-desc">It turns the conversation into a practical reference page while keeping the tone aligned with the mission: be clear, separate verified facts from interpretation, and avoid pretending to know what is not supported.</p>
+      <p class="section-desc">It turns the conversation into a practical reference page while keeping the tone aligned with the mission: be clear, separate supported facts from interpretation, and avoid pretending to know what is not supported.</p>
     </div>
     <div class="section-grid">
       <article class="aegis-card">
@@ -263,11 +278,13 @@
             <label for="task-type">Task type</label>
             <select id="task-type" name="task-type">
               <option value="writing">Writing</option>
+              <option value="writing-review">Low-risk writing review</option>
               <option value="coding">Coding</option>
               <option value="research">Research</option>
               <option value="visual">Visual analysis</option>
               <option value="planning">Planning</option>
-              <option value="audit">Audit work</option>
+              <option value="audit-general">General audit / review</option>
+              <option value="audit-contradiction">Contradiction-heavy audit</option>
             </select>
           </div>
           <div class="field">
@@ -405,14 +422,19 @@
   <section class="section" id="truth" aria-labelledby="truth-title">
     <div class="section-header">
       <span class="section-eyebrow">05 — Truth discipline</span>
-      <h2 id="truth-title">Verified facts, interpretation, and unknowns</h2>
-      <p class="section-desc">This section makes the epistemic boundaries visible. That helps the page stay useful without smuggling speculation into the final answer.</p>
+      <h2 id="truth-title">Artifact reviewed, interpretation, and unknowns</h2>
+      <p class="section-desc">This section makes the epistemic boundaries visible. That helps the page stay useful without smuggling speculation into the final answer. Manual review only so far; runtime browser validation is still pending.</p>
     </div>
     <div class="section-grid">
       <article class="aegis-card">
-        <h3>Verified facts</h3>
-        <p class="truth-copy">The page includes the user-provided equation 9 ÷ 3 = x and its result. The interface also uses a single-file HTML structure, dark theme tokens, skip link, and responsive sections.</p>
-        <div class="badge-row"><span class="badge known">Known</span></div>
+        <h3>Artifact reviewed</h3>
+        <p class="truth-copy">The page has been manually reviewed for structure, labels, and routing. This is not the same as official source verification.</p>
+        <div class="badge-row">
+          <span class="badge known">Known</span>
+          <span class="badge inferred">Inferred</span>
+          <span class="badge unclear">Unclear</span>
+          <span class="badge" style="background: rgba(245,158,11,.12); color: var(--rune-warning); border: 1px solid rgba(245,158,11,.24);">Pending</span>
+        </div>
       </article>
       <article class="aegis-card">
         <h3>Interpretation</h3>
@@ -422,25 +444,44 @@
       <article class="aegis-card">
         <h3>Unknowns</h3>
         <p class="truth-copy">Exact model availability, rollout timing, and account-specific picker behavior can change. The page does not pretend certainty where the source material does not support it.</p>
-        <div class="badge-row"><span class="badge unclear">Unclear</span></div>
+        <div class="badge-row">
+          <span class="badge unclear">Unclear</span>
+          <span class="badge" style="background: rgba(245,158,11,.12); color: var(--rune-warning); border: 1px solid rgba(245,158,11,.24);">Citation Required</span>
+          <span class="badge" style="background: rgba(245,158,11,.12); color: var(--rune-warning); border: 1px solid rgba(245,158,11,.24);">Needs Official Source</span>
+        </div>
+      </article>
+      <article class="aegis-card">
+        <h3>Confidence legend</h3>
+        <div class="status-legend">
+          <p class="truth-copy">Use these labels to understand the certainty level on the page.</p>
+          <ul class="status-legend-list">
+            <li><strong>Known</strong>: Supported by the current artifact or directly observed source material.</li>
+            <li><strong>Inferred</strong>: A reasonable interpretation drawn from the available evidence.</li>
+            <li><strong>Unclear</strong>: The evidence does not support a confident claim yet.</li>
+            <li><strong>Pending</strong>: A status or verification step has not been completed yet.</li>
+          </ul>
+        </div>
       </article>
     </div>
   </section>
 
   <section class="section" id="sources" aria-labelledby="sources-title">
     <div class="section-header">
-      <span class="section-eyebrow">06 — Sources / verification</span>
-      <h2 id="sources-title">Readable source names and placeholders</h2>
-      <p class="section-desc">Use this section as an audit trail. It intentionally avoids raw signed links and leaves clean placeholders for later live citations.</p>
+      <span class="section-eyebrow">06 — Sources / status</span>
+      <h2 id="sources-title">Readable source names and verification status</h2>
+      <p class="section-desc">Use this section as an audit trail. It intentionally avoids raw signed links and leaves clean placeholders for later live citations. Manual review is complete; official source verification is still pending.</p>
     </div>
     <div class="source-panel">
+      <div class="rune-box rune-warning">
+        <strong>Freshness status:</strong> <span>Artifact reviewed</span> is complete for this draft, while <span>Official source verification</span> is <strong>Pending</strong>.
+      </div>
       <ul class="source-list">
-        <li><strong>User-provided screenshot / conversation text.</strong> Placeholder: attach the exact image or transcript reference here during final publishing.</li>
-        <li><strong>OpenAI product documentation.</strong> Placeholder: add the specific official page title and permalink once verified.</li>
-        <li><strong>OpenAI release notes or model picker notes.</strong> Placeholder: cite the exact release note title and version date here.</li>
-        <li><strong>Project verification log.</strong> Placeholder: insert internal notes showing which statements were confirmed, inferred, or left unclear.</li>
+        <li><strong>User-provided screenshot / conversation text.</strong> <span class="badge" style="margin-left: 8px; background: rgba(245,158,11,.12); color: var(--rune-warning); border: 1px solid rgba(245,158,11,.24);">Pending</span> Attach the exact image or transcript reference here during final publishing.</li>
+        <li><strong>OpenAI product documentation.</strong> <span class="badge" style="margin-left: 8px; background: rgba(245,158,11,.12); color: var(--rune-warning); border: 1px solid rgba(245,158,11,.24);">Citation Required</span> Add the specific official page title and permalink once verified.</li>
+        <li><strong>OpenAI release notes or model picker notes.</strong> <span class="badge" style="margin-left: 8px; background: rgba(245,158,11,.12); color: var(--rune-warning); border: 1px solid rgba(245,158,11,.24);">Needs Official Source</span> Cite the exact release note title and version date here.</li>
+        <li><strong>Project verification log.</strong> <span class="badge" style="margin-left: 8px; background: rgba(245,158,11,.12); color: var(--rune-warning); border: 1px solid rgba(245,158,11,.24);">Pending</span> Insert internal notes showing which statements were confirmed, inferred, or left unclear.</li>
       </ul>
-      <p class="source-copy">When later citations are added, keep them readable and short. The goal is to show provenance without cluttering the page with raw signed URLs or opaque links.</p>
+      <p class="source-copy">When later citations are added, keep them readable and short. The goal is to show provenance without cluttering the page with raw signed URLs or opaque links. Do not label anything as officially verified until an official source has actually been checked.</p>
     </div>
   </section>
 
@@ -472,7 +513,7 @@
       <article class="aegis-card">
         <h3>Source verification</h3>
         <p class="card-copy">Use this when the answer must be traceable to a source and uncertainty must be labeled.</p>
-        <div class="code-wrap"><pre id="prompt-source">Separate verified facts, reasonable inference, and unknowns. Cite the source for each factual claim and say when evidence is insufficient.</pre></div>
+        <div class="code-wrap"><pre id="prompt-source">Separate supported facts, reasonable inference, and unknowns. Cite the source for each factual claim and say when evidence is insufficient.</pre></div>
         <div class="copy-row"><button class="vf-btn secondary small copy-btn" data-copy-target="prompt-source" type="button">Copy prompt</button></div>
       </article>
     </div>
@@ -542,27 +583,117 @@ x = 3</code></pre></div>
   </section>
 </main>
 <footer class="site-footer">
-  <p>Built for Jusstin DeRemus and the Fólkvangr Neural Core ecosystem.</p>
+  <p><span data-public-branding>Prepared as a single-file guide for public distribution.</span> <span data-internal-branding>Built for Jusstin DeRemus and the Fólkvangr Neural Core ecosystem.</span></p>
 </footer>
 <script>
 (function () {
   'use strict';
+  var storageKey = 'model-guide-mode';
   var nav = document.getElementById('site-nav');
   var sections = Array.prototype.slice.call(document.querySelectorAll('main section'));
-  nav.innerHTML = '<ul>' + sections.map(function (s) {
-    return '<li><a href="#' + s.id + '">' + s.querySelector('.section-eyebrow').textContent.replace(/\s+/g, ' ') + '</a></li>';
-  }).join('') + '</ul>';
-  var links = Array.prototype.slice.call(nav.querySelectorAll('a'));
-  var io = new IntersectionObserver(function (entries) {
-    entries.forEach(function (entry) {
-      if (entry.isIntersecting) {
-        links.forEach(function (a) { a.removeAttribute('aria-current'); });
-        var active = nav.querySelector('a[href="#' + entry.target.id + '"]');
-        if (active) active.setAttribute('aria-current', 'true');
+  var modeToggle = document.getElementById('mode-toggle');
+
+  function safeGetItem(key) {
+    try {
+      return window.localStorage ? window.localStorage.getItem(key) : null;
+    } catch (err) {
+      return null;
+    }
+  }
+
+  function safeSetItem(key, value) {
+    try {
+      if (window.localStorage) window.localStorage.setItem(key, value);
+    } catch (err) {}
+  }
+
+  function fallbackCopy(text) {
+    return new Promise(function (resolve, reject) {
+      try {
+        var ta = document.createElement('textarea');
+        ta.value = text;
+        ta.setAttribute('readonly', 'readonly');
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        var ok = false;
+        try {
+          ok = document.execCommand('copy');
+        } catch (err) {
+          ok = false;
+        }
+        document.body.removeChild(ta);
+        if (ok) resolve();
+        else reject(new Error('Copy failed'));
+      } catch (err) {
+        reject(err);
       }
     });
-  }, { threshold: 0.45 });
-  sections.forEach(function (section) { io.observe(section); });
+  }
+
+  function copyText(text) {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      return navigator.clipboard.writeText(text).catch(function () {
+        return fallbackCopy(text);
+      });
+    }
+    return fallbackCopy(text);
+  }
+
+  function getMode() {
+    var saved = safeGetItem(storageKey);
+    return saved === 'public' || saved === 'internal' ? saved : 'internal';
+  }
+
+  function setMode(mode) {
+    document.body.setAttribute('data-mode', mode);
+    safeSetItem(storageKey, mode);
+    if (modeToggle) {
+      modeToggle.setAttribute('aria-pressed', String(mode === 'public'));
+      modeToggle.textContent = mode === 'public' ? 'Switch to internal mode' : 'Switch to public mode';
+    }
+  }
+
+  setMode(getMode());
+
+  if (modeToggle) {
+    modeToggle.addEventListener('click', function () {
+      setMode(document.body.getAttribute('data-mode') === 'public' ? 'internal' : 'public');
+    });
+  }
+
+  if (nav && sections.length) {
+    var list = document.createElement('ul');
+    sections.forEach(function (s) {
+      var eyebrow = s.querySelector('.section-eyebrow');
+      var label = eyebrow ? eyebrow.textContent.replace(/\s+/g, ' ') : s.id;
+      var item = document.createElement('li');
+      var link = document.createElement('a');
+      link.href = '#' + s.id;
+      link.textContent = label;
+      item.appendChild(link);
+      list.appendChild(item);
+    });
+    while (nav.firstChild) nav.removeChild(nav.firstChild);
+    nav.appendChild(list);
+  }
+
+  var links = nav ? Array.prototype.slice.call(nav.querySelectorAll('a')) : [];
+  if ('IntersectionObserver' in window && nav && links.length && sections.length) {
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) {
+          links.forEach(function (a) { a.removeAttribute('aria-current'); });
+          var active = nav.querySelector('a[href="#' + entry.target.id + '"]');
+          if (active) active.setAttribute('aria-current', 'true');
+        }
+      });
+    }, { threshold: 0.45 });
+    sections.forEach(function (section) { io.observe(section); });
+  } else if (links.length) {
+    links[0].setAttribute('aria-current', 'true');
+  }
 
   var accuracy = document.getElementById('accuracy');
   var accuracyValue = document.getElementById('accuracy-value');
@@ -573,6 +704,7 @@ x = 3</code></pre></div>
   var wizardResult = document.getElementById('wizard-result');
   var wizardRun = document.getElementById('wizard-run');
   var wizardReset = document.getElementById('wizard-reset');
+  var wizardReady = accuracy && accuracyValue && taskType && complexity && speedDepth && risk && wizardResult && wizardRun && wizardReset;
 
   function scoreWizard() {
     var score = 0;
@@ -594,9 +726,35 @@ x = 3</code></pre></div>
     if (rk === 'high') score += 3;
     score += acc - 3;
 
-    if (task === 'coding' || task === 'audit' || task === 'research' || task === 'visual') score += 2;
+    if (task === 'coding' || task === 'research' || task === 'visual') score += 2;
     if (task === 'writing' && speed === 'speed' && comp === 'quick') score -= 2;
+    if (task === 'writing-review') {
+      reasons.push('Low-risk writing review should stay quick, readable, and careful.');
+      if (rk !== 'low') score += 1;
+      if (speed === 'speed' && comp === 'quick') score -= 1;
+    }
     if (task === 'planning' && speed !== 'speed') score += 1;
+    if (task === 'audit-general') {
+      score += 3;
+      reasons.push('General audit / review needs a careful check, not a casual fallback.');
+    }
+    if (task === 'audit-contradiction') {
+      score += 5;
+      reasons.push('Contradiction-heavy audit work needs the strongest reasoning path.');
+    }
+
+    if (task === 'audit-contradiction') {
+      return { model: 'o3', reason: reasons.join(' '), detail: 'Use the reasoning-first model because contradiction-heavy audit work benefits from the deepest check.' };
+    }
+    if (task === 'audit-general') {
+      return { model: 'GPT-5.5 High', reason: reasons.join(' '), detail: 'Use the high setting because general audit work should favor careful review over speed.' };
+    }
+    if (task === 'writing-review') {
+      if (score <= 2) {
+        return { model: 'GPT-5.5 Medium', reason: reasons.join(' '), detail: 'Use the middle setting because low-risk writing review benefits from a careful but not maximal pass.' };
+      }
+      return { model: 'GPT-5.5 High', reason: reasons.join(' '), detail: 'Use the higher setting because this review is no longer a simple lightweight pass.' };
+    }
 
     if (score <= -1) {
       reasons.push('The task looks lightweight, so speed is the main priority.');
@@ -607,29 +765,43 @@ x = 3</code></pre></div>
       return { model: 'GPT-5.5 Medium', reason: reasons.join(' '), detail: 'Use the middle setting because it balances speed, clarity, and careful reasoning.' };
     }
     reasons.push('The task is complex, risky, or accuracy-sensitive.');
-    if (task === 'coding' || task === 'audit' || task === 'research') {
+    if (task === 'coding' || task === 'research') {
       return { model: 'GPT-5.5 High', reason: reasons.join(' '), detail: 'Use the deeper setting because the problem needs multi-step reasoning and a careful check for edge cases.' };
     }
     return { model: 'o3', reason: reasons.join(' '), detail: 'Use the reasoning-first model when you want the strongest contradiction hunting, logic checking, or deep analysis.' };
   }
 
   function renderWizard() {
+    if (!wizardReady) return;
     accuracyValue.textContent = accuracy.value + ' / 5';
     var out = scoreWizard();
-    wizardResult.innerHTML = '<div class="result-title">Recommended: ' + out.model + '</div><p>' + out.detail + '</p><p>' + out.reason + '</p>';
+    var title = document.createElement('div');
+    title.className = 'result-title';
+    title.textContent = 'Recommended: ' + out.model;
+    var detail = document.createElement('p');
+    detail.textContent = out.detail;
+    var reason = document.createElement('p');
+    reason.textContent = out.reason;
+    while (wizardResult.firstChild) wizardResult.removeChild(wizardResult.firstChild);
+    wizardResult.appendChild(title);
+    wizardResult.appendChild(detail);
+    wizardResult.appendChild(reason);
   }
-  accuracy.addEventListener('input', renderWizard);
-  [taskType, complexity, speedDepth, risk].forEach(function (el) { el.addEventListener('change', renderWizard); });
-  wizardRun.addEventListener('click', renderWizard);
-  wizardReset.addEventListener('click', function () {
-    taskType.value = 'writing'; complexity.value = 'mixed'; speedDepth.value = 'balanced'; risk.value = 'low'; accuracy.value = '3'; renderWizard();
-  });
-  renderWizard();
+  if (wizardReady) {
+    accuracy.addEventListener('input', renderWizard);
+    [taskType, complexity, speedDepth, risk].forEach(function (el) { el.addEventListener('change', renderWizard); });
+    wizardRun.addEventListener('click', renderWizard);
+    wizardReset.addEventListener('click', function () {
+      taskType.value = 'writing';
+      complexity.value = 'mixed';
+      speedDepth.value = 'balanced';
+      risk.value = 'low';
+      accuracy.value = '3';
+      renderWizard();
+    });
+    renderWizard();
+  }
 
-  function copyText(text) {
-    if (navigator.clipboard && navigator.clipboard.writeText) return navigator.clipboard.writeText(text);
-    var ta = document.createElement('textarea'); ta.value = text; ta.setAttribute('readonly', 'readonly'); ta.style.position = 'fixed'; ta.style.opacity = '0'; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta); return Promise.resolve();
-  }
   Array.prototype.slice.call(document.querySelectorAll('.copy-btn')).forEach(function (btn) {
     btn.addEventListener('click', function () {
       var target = document.getElementById(btn.getAttribute('data-copy-target'));
@@ -639,7 +811,16 @@ x = 3</code></pre></div>
         btn.textContent = '✓ Copied';
         btn.style.borderColor = 'rgba(16,185,129,.45)';
         btn.style.color = 'var(--rune-success)';
-        setTimeout(function () { btn.textContent = original; btn.style.borderColor = ''; btn.style.color = ''; }, 2000);
+        setTimeout(function () {
+          btn.textContent = original;
+          btn.style.borderColor = '';
+          btn.style.color = '';
+        }, 2000);
+      }).catch(function () {
+        btn.textContent = 'Copy unavailable';
+        setTimeout(function () {
+          btn.textContent = original;
+        }, 2000);
       });
     });
   });
